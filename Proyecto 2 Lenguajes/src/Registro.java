@@ -2,11 +2,11 @@
 import java.awt.Color;
 
 public class Registro {
-    private String nombre,apellido,direccion,marca,modelo,telefono,imagen;
+    private String nombre,apellido,direccion,marca,modelo,telefono,imagen,placa;
     private Color color;
     private int id,cedula,año;
 
-    public Registro(String nombre, String apellido, String direccion, String marca, String modelo, String telefono, String imagen, Color color, int id, int cedula, int año) {
+    public Registro(String nombre, String apellido, String direccion, String marca, String modelo, String telefono, String imagen, Color color, int id, int cedula, int año, String placa) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.direccion = direccion;
@@ -18,6 +18,7 @@ public class Registro {
         this.id = id;
         this.cedula = cedula;
         this.año = año;
+        this.placa = placa;
     }
 
     public String getNombre() {
@@ -106,6 +107,14 @@ public class Registro {
 
     public void setAño(int año) {
         this.año = año;
+    }
+
+    public String getPlaca() {
+        return placa;
+    }
+
+    public void setPlaca(String placa) {
+        this.placa = placa;
     }
     
     

@@ -1,81 +1,112 @@
 
 import java.awt.Color;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class DetalleRegistro extends JFrame {
 
     private Registro registro;
     private Interfaz interfaz;
 
-    private JTextField idtxt, nombretxt, apellidotxt, cedulatxt, telefonotxt,
-            direcciontxt, añotxt, marcatxt, modelotxt, colortxt,
-            imagentxt;
-    private JLabel lblImagen;
+    private JComboBox<String> comboboxMarca;
+    private JComboBox<String> comboboxModelo;    
+    
+    private JTextField nombretxt, apellidotxt, cedulatxt, telefonotxt,
+            direcciontxt, añotxt, marcatxt, modelotxt, placatxt;
+    private JLabel lblImagen, lblRutaImagen;
     private JButton btnSeleccionarColor, btnSeleccionarImagen;
     private Color colorSeleccionado;
     private String rutaImagenSeleccionada;
 
-    public DetalleRegistro(Registro registro) {
-        Interfaz interfaz = new Interfaz();
+    public DetalleRegistro(Registro registro, Interfaz interfaz) {
+        
         this.registro = registro;
         this.interfaz = interfaz;
         this.colorSeleccionado = registro.getColor();
         this.rutaImagenSeleccionada = registro.getImagen();
-        setTitle("Detalle del registro");
-        setSize(300, 300);
+        setTitle("Detalles del registro");
+        setSize(800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new GridLayout(13, 2));
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        this.setResizable(false);
 
-        add(new JLabel("ID: "));
-        add(new JLabel(String.valueOf(registro.getId())));
+        int y = 0;
 
-        add(new JLabel("Nombre: "));
+        // ID
+        addLabelAndComponent(new JLabel("ID: "), new JLabel(String.valueOf(registro.getId())), gbc, y++);
+
+        // Nombre
         nombretxt = new JTextField(registro.getNombre());
-        add(nombretxt);
+        addLabelAndComponent(new JLabel("Nombre: "), nombretxt, gbc, y++);
 
-        add(new JLabel("Apellido: "));
+        // Apellido
         apellidotxt = new JTextField(registro.getApellido());
-        add(apellidotxt);
+        addLabelAndComponent(new JLabel("Apellido: "), apellidotxt, gbc, y++);
 
-        add(new JLabel("Cédula: "));
+        // Cédula
         cedulatxt = new JTextField(String.valueOf(registro.getCedula()));
-        add(cedulatxt);
+        addLabelAndComponent(new JLabel("Cédula: "), cedulatxt, gbc, y++);
 
-        add(new JLabel("Teléfono: "));
+        // Teléfono
         telefonotxt = new JTextField(registro.getTelefono());
-        add(telefonotxt);
+        addLabelAndComponent(new JLabel("Teléfono: "), telefonotxt, gbc, y++);
 
-        add(new JLabel("Dirección: "));
+        // Placa
+        placatxt = new JTextField(registro.getPlaca());
+        addLabelAndComponent(new JLabel("Placa: "), placatxt, gbc, y++);        
+        
+        // Dirección
         direcciontxt = new JTextField(registro.getDireccion());
-        add(direcciontxt);
+        addLabelAndComponent(new JLabel("Dirección: "), direcciontxt, gbc, y++);
 
-        add(new JLabel("Año del Vehículo: "));
+        // Año del Vehículo
         añotxt = new JTextField(String.valueOf(registro.getAño()));
-        add(añotxt);
+        addLabelAndComponent(new JLabel("Año del Vehículo: "), añotxt, gbc, y++);
 
-        add(new JLabel("Marca: "));
-        marcatxt = new JTextField(registro.getMarca());
-        add(marcatxt);
+        // Marca
+        comboboxMarca = new JComboBox<>(new String[]{"Ford", "Chevrolet", "Toyota", "Honda", "Volkswagen"});
+        comboboxMarca.setSelectedItem(registro.getMarca());
+        addLabelAndComponent(new JLabel("Marca: "), comboboxMarca, gbc, y++);
+        comboboxMarca.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                actualizarModelo();
+            }
+        });
 
-        add(new JLabel("Modelo: "));
-        modelotxt = new JTextField(registro.getModelo());
-        add(modelotxt);
+        // Modelo
+        comboboxModelo = new JComboBox<>(obtenerModelos((String) comboboxMarca.getSelectedItem()));
+        comboboxModelo.setSelectedItem(registro.getModelo());
+        addLabelAndComponent(new JLabel("Modelo: "), comboboxModelo, gbc, y++);
 
-        add(new JLabel("Imagen: "));
-        lblImagen = new JLabel(rutaImagenSeleccionada);
-        add(lblImagen);
+        // Imagen
+        lblRutaImagen = new JLabel(rutaImagenSeleccionada);
+        lblImagen = new JLabel();
+        actualizarImagen(rutaImagenSeleccionada);
+
         btnSeleccionarImagen = new JButton("Seleccionar Imagen");
         btnSeleccionarImagen.addActionListener(new ActionListener() {
             @Override
@@ -83,9 +114,17 @@ public class DetalleRegistro extends JFrame {
                 seleccionarImagen();
             }
         });
-        add(btnSeleccionarImagen);
+        
+        addLabelAndComponent(new JLabel("Ruta de Imagen: "), lblRutaImagen, gbc, y++);
+        addLabelAndComponent(new JLabel("Imagen: "), lblImagen, gbc, y++);
+        gbc.gridwidth = 2;
+        gbc.gridx = 0;
+        gbc.gridy = y++;
+        add(btnSeleccionarImagen, gbc);
+        gbc.gridwidth = 1;
+        gbc.gridy = y++;
 
-        add(new JLabel("Color: "));
+        // Color
         btnSeleccionarColor = new JButton("Seleccionar Color");
         btnSeleccionarColor.setBackground(colorSeleccionado);
         btnSeleccionarColor.addActionListener(new ActionListener() {
@@ -94,17 +133,31 @@ public class DetalleRegistro extends JFrame {
                 seleccionarColor();
             }
         });
-        //CREACION DE BOTONES
+        addLabelAndComponent(new JLabel("Color: "), btnSeleccionarColor, gbc, y++);
+
+        // Botones de acción
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         JButton btnModificar = new JButton("Modificar");
         JButton btnEliminar = new JButton("Eliminar");
         JButton btnAlquilar = new JButton("Alquilar");
         JButton btnVender = new JButton("Vender");
 
-        add(btnModificar);
-        add(btnEliminar);
-        add(btnAlquilar);
-        add(btnVender);
+        buttonPanel.add(btnModificar);
+        buttonPanel.add(Box.createHorizontalStrut(10));
+        buttonPanel.add(btnEliminar);
+        buttonPanel.add(Box.createHorizontalStrut(10));
+        buttonPanel.add(btnAlquilar);
+        buttonPanel.add(Box.createHorizontalStrut(10));
+        buttonPanel.add(btnVender);
 
+        gbc.gridwidth = 2;
+        gbc.gridx = 0;
+        gbc.gridy = y++;
+        add(buttonPanel, gbc);
+
+        //EVENTOS
+        
         btnModificar.addActionListener(new ActionListener() { //MODIFICAR
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -122,24 +175,60 @@ public class DetalleRegistro extends JFrame {
         btnAlquilar.addActionListener(new ActionListener() { //ALQUILAR
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                // Acción para alquilar
             }
         });
 
         btnVender.addActionListener(new ActionListener() { //VENDER
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                // Acción para vender
             }
         });
     }
 
+    private void addLabelAndComponent(JLabel label, JComponent component, GridBagConstraints gbc, int y) {
+        gbc.gridx = 0;
+        gbc.gridy = y;
+        add(label, gbc);
+        gbc.gridx = 1;
+        add(component, gbc);
+    }
+
+    private String[] obtenerModelos(String marca) {
+        switch (marca) {
+            case "Ford":
+                return new String[]{"Fiesta", "Focus", "Mustang"};
+            case "Chevrolet":
+                return new String[]{"Silverado", "Cruze", "Camaro"};
+            case "Toyota":
+                return new String[]{"Corolla", "Camry", "RAV4"};
+            case "Honda":
+                return new String[]{"Civic", "Accord", "CR-V"};
+            case "Volkswagen":
+                return new String[]{"Golf", "Jetta", "Tiguan"};
+            default:
+                return new String[]{"Seleccione modelo"};
+        }
+    }
+    
     private void seleccionarImagen() {
         JFileChooser seleccion = new JFileChooser();
+        File ruta = new File("C:\\Users\\Jean Odriozola\\Documents\\GitHub\\Vehiculos-Java\\Proyecto 2 Lenguajes\\src\\fotos");//instancia de la ruta
+        seleccion.setCurrentDirectory(ruta); //establecemos la ruta inicial del selector de imagenes
+        seleccion.setFileFilter(new FileNameExtensionFilter("Archivos de Imagen", "jpg", "jpeg", "png"));        
         int cuadro = seleccion.showOpenDialog(this); //abrir el cuadro de seleccion
         if (cuadro == JFileChooser.APPROVE_OPTION) {
-            imagentxt.setText(seleccion.getSelectedFile().getPath());
+            rutaImagenSeleccionada = seleccion.getSelectedFile().getPath();
+            lblRutaImagen.setText(rutaImagenSeleccionada);
+            actualizarImagen(rutaImagenSeleccionada);
         }
+    }
+
+    private void actualizarImagen(String rutaImagen) {
+        ImageIcon icon = new ImageIcon(rutaImagen);
+        Image image = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+        lblImagen.setIcon(new ImageIcon(image));
     }
 
     private void seleccionarColor() {
@@ -150,15 +239,20 @@ public class DetalleRegistro extends JFrame {
         }
     }
 
+    private void actualizarModelo() {
+        comboboxModelo.setModel(new javax.swing.DefaultComboBoxModel<>(obtenerModelos((String) comboboxMarca.getSelectedItem())));
+    }
+
     private void modificarRegistro() {
         registro.setNombre(nombretxt.getText());
         registro.setApellido(apellidotxt.getText());
         registro.setDireccion(direcciontxt.getText());
-        registro.setMarca(marcatxt.getText());
-        registro.setModelo(modelotxt.getText());
+        registro.setMarca((String) comboboxMarca.getSelectedItem());
+        registro.setModelo((String) comboboxModelo.getSelectedItem());
         registro.setTelefono(telefonotxt.getText());
-        //registro.setImagen(imagentxt.getText());
         registro.setColor(colorSeleccionado);
+        registro.setImagen(rutaImagenSeleccionada);
+        registro.setPlaca(placatxt.getText());
 
         int year = Integer.parseInt(añotxt.getText());
         registro.setAño(year);
@@ -167,15 +261,17 @@ public class DetalleRegistro extends JFrame {
 
         interfaz.actualizarTabla();
         JOptionPane.showMessageDialog(this, "Registro Modificado exitosamente");
-        //VALIDAR
+        this.dispose();
     }
     
     private void eliminarRegistro(){
         int confirmar = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el registro?", "Confirmar", JOptionPane.YES_NO_OPTION);
         if(confirmar == JOptionPane.YES_OPTION){
             interfaz.elliminarRegistro(registro);
-            dispose();
+            for (int i = 0; i < interfaz.listaReg.size(); i++) {
+                interfaz.listaReg.get(i).setId(i + 1);
+            }
+          this.dispose();
         }
-        
     }
 }
