@@ -1,9 +1,9 @@
-public class Deportivo extends Vehiculo{
-    private static final double descuento = 0.05; // 5%
-    private static final double alquilerDia = 100.0; // Precio base por día
-    private static final double precioVenta = 12000.0; // Precio base por día
+public class Sedan extends Vehiculo{
+    private static final double descuento = 0.15; // 10%
+    private static final double alquilerDia = 50.0; // Precio base por día
+    private static final double precioVenta = 5000.0; // Precio base por día
     
-    public Deportivo(String marca, String modelo, String tipo, int año) {
+    public Sedan(String marca, String modelo, String tipo, int año) {
         super(marca, modelo, tipo, año);
     }
 
@@ -40,5 +40,5 @@ public class Deportivo extends Vehiculo{
     @Override
     public double getPrecioVenta() {
         return precioVenta;
-    }    
+    }      
 }

@@ -127,6 +127,7 @@ public class DetalleRegistro extends JFrame {
         // Color
         btnSeleccionarColor = new JButton("Seleccionar Color");
         btnSeleccionarColor.setBackground(colorSeleccionado);
+        
         btnSeleccionarColor.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -175,14 +176,14 @@ public class DetalleRegistro extends JFrame {
         btnAlquilar.addActionListener(new ActionListener() { //ALQUILAR
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Acción para alquilar
+                abrirAlquilar();
             }
         });
 
         btnVender.addActionListener(new ActionListener() { //VENDER
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Acción para vender
+                abrirVender();
             }
         });
     }
@@ -274,4 +275,78 @@ public class DetalleRegistro extends JFrame {
           this.dispose();
         }
     }
+    
+        private void abrirAlquilar() {
+        Vehiculo vehiculo;
+        String marca = (String) comboboxMarca.getSelectedItem();
+        String modelo = (String) comboboxModelo.getSelectedItem();
+        int year = Integer.parseInt(añotxt.getText());
+
+        switch (modelo) {
+            case "Camry":
+            case "Accord":
+            case "Jetta":
+            case "Fiesta":
+            case "Cruze":
+            case "Corolla":
+            case "Civic":
+                vehiculo = new Sedan(marca, modelo, "Sedán", year);
+                break;
+            case "RAV4":
+            case "CR-V":
+            case "Tiguan":
+            case "Silverado":
+                vehiculo = new Camioneta(marca, modelo, "Camioneta", year);
+                break;
+            case "Mustang":
+            case "Camaro":
+            case "Focus":
+            case "Golf":    
+                vehiculo = new Deportivo(marca, modelo, "Deportivo", year);
+                break;
+            default:
+                JOptionPane.showMessageDialog(this, "Modelo de vehículo no soportado", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+        }
+
+        Alquiler alquilerVentana = new Alquiler(vehiculo);
+        alquilerVentana.setVisible(true);
+    }
+        
+        private void abrirVender() {
+        Vehiculo vehiculo;
+        String marca = (String) comboboxMarca.getSelectedItem();
+        String modelo = (String) comboboxModelo.getSelectedItem();
+        int year = Integer.parseInt(añotxt.getText());
+
+        switch (modelo) {
+            case "Camry":
+            case "Accord":
+            case "Jetta":
+            case "Fiesta":
+            case "Cruze":
+            case "Corolla":
+            case "Civic":
+                vehiculo = new Sedan(marca, modelo, "Sedán", year);
+                break;
+            case "RAV4":
+            case "CR-V":
+            case "Tiguan":
+            case "Silverado":
+                vehiculo = new Camioneta(marca, modelo, "Camioneta", year);
+                break;
+            case "Mustang":
+            case "Camaro":
+            case "Focus":
+            case "Golf":    
+                vehiculo = new Deportivo(marca, modelo, "Deportivo", year);
+                break;
+            default:
+                JOptionPane.showMessageDialog(this, "Modelo de vehículo no soportado", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+        }
+
+        Venta ventaVentana = new Venta(vehiculo);
+        ventaVentana.setVisible(true);
+    }        
 }

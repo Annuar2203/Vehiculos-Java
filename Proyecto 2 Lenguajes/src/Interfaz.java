@@ -37,7 +37,6 @@ public class Interfaz extends javax.swing.JFrame {
     public void continuarCrear() {
         Registro nuevoRegistro = new Registro(nombre, apellido, direccion, marca, modelo, telefono, imagen, color, id, cedula, año, placa);
         listaReg.add(nuevoRegistro);
-        System.out.println(listaReg.get(0));
         id++;
         actualizarTabla();
     }
