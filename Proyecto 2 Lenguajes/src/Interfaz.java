@@ -2,14 +2,13 @@ import java.awt.Color;
 import java.awt.Image;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Optional;
 import javax.swing.ImageIcon;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -30,7 +29,6 @@ public class Interfaz extends javax.swing.JFrame {
     private String marca, modelo;
     private String placa;
 
-    private Vehiculo vehiculo;
     private int id = 1;
     private String imgRuta;
 
@@ -44,19 +42,18 @@ public class Interfaz extends javax.swing.JFrame {
     public void actualizarTabla() {
         DefaultTableModel model = (DefaultTableModel) tabla.getModel();
         model.setRowCount(0);
-
+        int index = 1;
         for (Registro registro : listaReg) {
             model.addRow(new Object[]{
-                registro.getId(),
+                index,
                 registro.getNombre(),
                 registro.getApellido(),
                 registro.getMarca(),
                 registro.getModelo()
             });
+            index++;
         }
-        for (int i = 0; i < model.getRowCount(); i++) {
-            model.setValueAt(i + 1, i, 0); // El ID comienza en 1, por lo que se agrega 1 a 'i'
-        }
+
     }
 
     //Centrar celdas del JTable
@@ -80,17 +77,12 @@ public class Interfaz extends javax.swing.JFrame {
             columnModel.getColumn(i).setCellRenderer(centerRenderer);
         }
 
-        //Agregar ListSelectionListener
-        tabla.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent event) {
-                if (!event.getValueIsAdjusting()) {
-                    int filaSeleccionada = tabla.getSelectedRow();
-                    if (filaSeleccionada >= 0) {
-                        Registro registro = listaReg.get(filaSeleccionada);
-                        DetalleRegistro detalle = new DetalleRegistro(registro, Interfaz.this);
-                        detalle.setVisible(true);
-                    }
-                }
+        tabla.getSelectionModel().addListSelectionListener(event -> {
+            int filaSeleccionada = !event.getValueIsAdjusting() ? tabla.getSelectedRow() : -1;
+            Registro registro = (filaSeleccionada >= 0) ? listaReg.get(filaSeleccionada) : null;
+            DetalleRegistro detalle = (registro != null) ? new DetalleRegistro(registro, Interfaz.this) : null;
+            if (detalle != null) {
+                detalle.setVisible(true);
             }
         });
 
@@ -209,7 +201,6 @@ public class Interfaz extends javax.swing.JFrame {
 
         jLabel7.setText("Color");
 
-        boton_color.setBackground(new java.awt.Color(153, 153, 153));
         boton_color.setText("Seleccionar color");
         boton_color.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -384,11 +375,11 @@ public class Interfaz extends javax.swing.JFrame {
         marca = (String) combobox1.getSelectedItem(); // Obtiene la marca seleccionada
 
         String[] modelos = marca.equals("Ford") ? new String[]{"Fiesta", "Focus", "Mustang"}
-                         : marca.equals("Chevrolet") ? new String[]{"Silverado", "Cruze", "Camaro"}
-                         : marca.equals("Toyota") ? new String[]{"Corolla", "Camry", "RAV4"}
-                         : marca.equals("Honda") ? new String[]{"Civic", "Accord", "CR-V"}
-                         : marca.equals("Volkswagen") ? new String[]{"Golf", "Jetta", "Tiguan"}
-                         : new String[]{"Seleccione un modelo"};
+                : marca.equals("Chevrolet") ? new String[]{"Silverado", "Cruze", "Camaro"}
+                : marca.equals("Toyota") ? new String[]{"Corolla", "Camry", "RAV4"}
+                : marca.equals("Honda") ? new String[]{"Civic", "Accord", "CR-V"}
+                : marca.equals("Volkswagen") ? new String[]{"Golf", "Jetta", "Tiguan"}
+                : new String[]{"Seleccione un modelo"};
 
         combobox2.addItem(modelos[0]);
         combobox2.addItem(modelos.length > 1 ? modelos[1] : null);
@@ -402,54 +393,46 @@ public class Interfaz extends javax.swing.JFrame {
     }//GEN-LAST:event_boton_colorActionPerformed
 
     private void boton_crearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton_crearActionPerformed
+        try {
+            cedula = Integer.parseInt(campo3.getText());
+            año = Integer.parseInt(campo6.getText());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Debe llenar la Cédula y el Año del registro adecuadamente", "Error", JOptionPane.ERROR_MESSAGE);
+        }
         // Se obtiene la info de los campos
-
         nombre = campo1.getText();
         apellido = campo2.getText();
-        cedula = Integer.parseInt(campo3.getText());
         telefono = campo4.getText();
         direccion = campo5.getText();
         placa = campo7.getText();
-        año = Integer.parseInt(campo6.getText());
         marca = (String) combobox1.getSelectedItem();
         modelo = (String) combobox2.getSelectedItem();
         imagen = imgRuta;
-        //vehiculo = new Vehiculo(marca,modelo);
-        // Se hacen las validaciones de una vez junto con una notificacion especificada
 
-        if (nombre.matches("^[a-zA-Z]+$")) {
-            if (apellido.matches("^[a-zA-Z]+$")) {
-                if (cedula >= 1 && cedula <= 40000000) {
-                    if (telefono.matches("^0[0-9]{3}-[0-9]{7}$")) {
-                        if (direccion.matches("^[a-zA-Z\\s]+$")) {
-                            if (año >= 1960 && año <= 2024) {
-                                if (marca != "Seleccione marca" && modelo != "Seleccione modelo") {
-                                    if ((String) combobox2.getSelectedItem() != null) {
-                                        JOptionPane.showMessageDialog(null, "Datos validados exitosamente");
-                                        continuarCrear();
-                                    } else {
-                                        JOptionPane.showMessageDialog(null, "Seleccione un modelo valido");
-                                    }
-                                } else {
-                                    JOptionPane.showMessageDialog(null, "Seleccione una marca valida");
-                                }
-                            } else {
-                                JOptionPane.showMessageDialog(null, "Introduzca un año valido");
-                            }
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Introduzca un año valido");
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Introduzca una direccion valida");
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Introduzca una cedula valida");
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "El apellido solo debe contener letras");
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "El nombre solo debe contener letras");
+        // Verificar si todos los campos están llenos
+        boolean camposLlenos = !nombre.isEmpty() && !apellido.isEmpty() && !campo3.getText().isEmpty() && !telefono.isEmpty()
+                && !direccion.isEmpty() && !placa.isEmpty() && !campo6.getText().isEmpty() && !marca.equals("Seleccione marca")
+                && !modelo.equals("Seleccione modelo") && imagen != null;
+
+        // Validaciones de los campos
+        String message = !camposLlenos ? "Todos los campos deben estar llenos"
+                        : !nombre.matches("^[a-zA-ZñÑÁÉÍÓÚáéíóú]+$") ? "El nombre solo debe contener letras"
+                        : !apellido.matches("^[a-zA-ZñÑÁÉÍÓÚáéíóú]+$") ? "El apellido solo debe contener letras"
+                        : !(cedula >= 1 && cedula < 40000001) ? "Introduzca una cédula válida (Máximo 40 millones)"
+                        : !placa.matches("^[A-Z0-9-]+$") ? "La placa debe contener solo letras mayúsculas, números y puede contener guiones (-)"
+                        : !telefono.matches("^0[0-9]{3}-[0-9]{7}$") ? "Introduzca un teléfono válido (0XXX-XXXXXXX)"
+                        : !direccion.matches("^[a-zA-ZñÑ\\s\\-\\.]+$") ? "Introduzca una dirección válida"
+                        : !(año >= 1960 && año <= 2024) ? "Introduzca un año válido (1960-2024)"
+                        : "Seleccione marca".equals(marca) ? "Seleccione una marca válida"
+                        : "Seleccione modelo".equals(modelo) ? "Seleccione un modelo válido"
+                        : combobox2.getSelectedItem() == null ? "Seleccione un modelo válido"
+                        : "Datos validados exitosamente";
+
+        JOptionPane.showMessageDialog(null, message);
+
+        if ("Datos validados exitosamente".equals(message)) {
+            continuarCrear();
+            limpiarActionPerformed(null); // Llama al método limpiarActionPerformed para limpiar los campos después de crear el registro
         }
     }//GEN-LAST:event_boton_crearActionPerformed
 
@@ -462,13 +445,16 @@ public class Interfaz extends javax.swing.JFrame {
         seleccion.setFileFilter(new FileNameExtensionFilter("Archivos de Imagen", "jpg", "jpeg", "png"));
         int cuadro = seleccion.showOpenDialog(this); //abrir el cuadro de seleccion
 
-        if (cuadro == JFileChooser.APPROVE_OPTION) {
-            path = seleccion.getSelectedFile().getPath();
-            imgRuta = path;
-            Image img = new ImageIcon(path).getImage();
-            ImageIcon icon = new ImageIcon(img.getScaledInstance(panel_imagen.getWidth(), panel_imagen.getHeight(), Image.SCALE_SMOOTH));
-            panel_imagen.setIcon(icon);
-        }
+        path = (cuadro == JFileChooser.APPROVE_OPTION) ? seleccion.getSelectedFile().getPath() : path;
+
+        Optional.ofNullable(path) //crea un Optional de path
+                .filter(p -> !p.isEmpty()) //filtrar para que path no este vacio
+                .ifPresent(p -> { //si pasa el filtro, continua la ejecucion
+                    imgRuta = p;
+                    Image img = new ImageIcon(p).getImage();
+                    ImageIcon icon = new ImageIcon(img.getScaledInstance(panel_imagen.getWidth(), panel_imagen.getHeight(), Image.SCALE_SMOOTH));
+                    panel_imagen.setIcon(icon);
+                });
     }//GEN-LAST:event_fotoActionPerformed
 
     private void limpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limpiarActionPerformed
@@ -479,7 +465,8 @@ public class Interfaz extends javax.swing.JFrame {
         campo5.setText("");
         campo6.setText("");
         campo7.setText("");
-        boton_color.setBackground(Color.gray);
+        combobox1.setSelectedItem("Seleccione Marca");
+        boton_color.setBackground(Color.white);
         panel_imagen.setIcon(null);
     }//GEN-LAST:event_limpiarActionPerformed
     //Usado para poner el logo de la UJAP

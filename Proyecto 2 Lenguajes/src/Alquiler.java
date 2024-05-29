@@ -128,7 +128,7 @@ public class Alquiler extends JFrame {
             precioTotalLbl.setText(String.format("%.2f", precioTotal));
             precioConDescuentoLbl.setText(String.format("%.2f", precioConDescuento));
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Por favor ingrese un número válido de días.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Por favor ingrese un número válido en días", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

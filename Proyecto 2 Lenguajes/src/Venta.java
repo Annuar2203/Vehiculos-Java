@@ -1,12 +1,8 @@
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 public class Venta extends JFrame {
     private Vehiculo vehiculo;
@@ -15,7 +11,7 @@ public class Venta extends JFrame {
     public Venta(Vehiculo vehiculo) {
         this.vehiculo = vehiculo;
         setTitle("Vender Vehículo");
-        setSize(250, 300);
+        setSize(280, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new GridBagLayout());
@@ -122,14 +118,6 @@ public class Venta extends JFrame {
     }
 
     private double obtenerDescuentoPorAntiguedad(int antiguedad) {
-        if (antiguedad < 1) {
-            return 0.0; // Sin descuento
-        } else if (antiguedad <= 10) {
-            return 0.05; // 5% de descuento
-        } else if (antiguedad <= 20) {
-            return 0.10; // 10% de descuento
-        } else {
-            return 0.20; // 15% de descuento
-        }
+        return antiguedad < 1 ? 0.0 : antiguedad <= 10 ? 0.05 : antiguedad <= 20 ? 0.10 : 0.20;
     }
 }

@@ -197,33 +197,23 @@ public class DetalleRegistro extends JFrame {
     }
 
     private String[] obtenerModelos(String marca) {
-        switch (marca) {
-            case "Ford":
-                return new String[]{"Fiesta", "Focus", "Mustang"};
-            case "Chevrolet":
-                return new String[]{"Silverado", "Cruze", "Camaro"};
-            case "Toyota":
-                return new String[]{"Corolla", "Camry", "RAV4"};
-            case "Honda":
-                return new String[]{"Civic", "Accord", "CR-V"};
-            case "Volkswagen":
-                return new String[]{"Golf", "Jetta", "Tiguan"};
-            default:
-                return new String[]{"Seleccione modelo"};
-        }
+        return marca.equals("Ford") ? new String[]{"Fiesta", "Focus", "Mustang"} :
+               marca.equals("Chevrolet") ? new String[]{"Silverado", "Cruze", "Camaro"} :
+               marca.equals("Toyota") ? new String[]{"Corolla", "Camry", "RAV4"} :
+               marca.equals("Honda") ? new String[]{"Civic", "Accord", "CR-V"} :
+               marca.equals("Volkswagen") ? new String[]{"Golf", "Jetta", "Tiguan"} :
+               new String[]{"Seleccione modelo"};
     }
-    
+
     private void seleccionarImagen() {
         JFileChooser seleccion = new JFileChooser();
         File ruta = new File("C:\\Users\\Jean Odriozola\\Documents\\GitHub\\Vehiculos-Java\\Proyecto 2 Lenguajes\\src\\fotos");//instancia de la ruta
         seleccion.setCurrentDirectory(ruta); //establecemos la ruta inicial del selector de imagenes
         seleccion.setFileFilter(new FileNameExtensionFilter("Archivos de Imagen", "jpg", "jpeg", "png"));        
         int cuadro = seleccion.showOpenDialog(this); //abrir el cuadro de seleccion
-        if (cuadro == JFileChooser.APPROVE_OPTION) {
-            rutaImagenSeleccionada = seleccion.getSelectedFile().getPath();
-            lblRutaImagen.setText(rutaImagenSeleccionada);
-            actualizarImagen(rutaImagenSeleccionada);
-        }
+        rutaImagenSeleccionada = (cuadro == JFileChooser.APPROVE_OPTION) ? seleccion.getSelectedFile().getPath() : rutaImagenSeleccionada;
+        lblRutaImagen.setText(rutaImagenSeleccionada);
+        actualizarImagen(rutaImagenSeleccionada);
     }
 
     private void actualizarImagen(String rutaImagen) {
@@ -234,36 +224,60 @@ public class DetalleRegistro extends JFrame {
 
     private void seleccionarColor() {
         Color color = JColorChooser.showDialog(this, "Seleccione un Color", colorSeleccionado);
-        if (color != null) {
-            colorSeleccionado = color;
-            btnSeleccionarColor.setBackground(color);
-        }
+        colorSeleccionado = (color != null) ? color : colorSeleccionado;
+        btnSeleccionarColor.setBackground(colorSeleccionado);
     }
 
     private void actualizarModelo() {
         comboboxModelo.setModel(new javax.swing.DefaultComboBoxModel<>(obtenerModelos((String) comboboxMarca.getSelectedItem())));
     }
 
-    private void modificarRegistro() {
-        registro.setNombre(nombretxt.getText());
-        registro.setApellido(apellidotxt.getText());
-        registro.setDireccion(direcciontxt.getText());
-        registro.setMarca((String) comboboxMarca.getSelectedItem());
-        registro.setModelo((String) comboboxModelo.getSelectedItem());
-        registro.setTelefono(telefonotxt.getText());
-        registro.setColor(colorSeleccionado);
-        registro.setImagen(rutaImagenSeleccionada);
-        registro.setPlaca(placatxt.getText());
+private void modificarRegistro() {
+    try {
+        int cedula = Integer.parseInt(cedulatxt.getText());
+        int año = Integer.parseInt(añotxt.getText());
+        
+        // Verificar si todos los campos están llenos
+        boolean camposLlenos = !nombretxt.getText().isEmpty() && !apellidotxt.getText().isEmpty() && 
+                               !cedulatxt.getText().isEmpty() && !telefonotxt.getText().isEmpty() && 
+                               !direcciontxt.getText().isEmpty() && !placatxt.getText().isEmpty() && 
+                               !añotxt.getText().isEmpty() && !comboboxMarca.getSelectedItem().equals("Seleccione marca") && 
+                               !comboboxModelo.getSelectedItem().equals("Seleccione modelo");
 
-        int year = Integer.parseInt(añotxt.getText());
-        registro.setAño(year);
-        int cedu = Integer.parseInt(cedulatxt.getText());
-        registro.setCedula(cedu);
+        // Validaciones de los campos
+        String message = !camposLlenos ? "Todos los campos deben estar llenos"
+                        : !nombretxt.getText().matches("^[a-zA-ZñÑÁÉÍÓÚáéíóú]+$") ? "El nombre solo debe contener letras"
+                        : !apellidotxt.getText().matches("^[a-zA-ZñÑÁÉÍÓÚáéíóú]+$") ? "El apellido solo debe contener letras"
+                        : !(cedula >= 1 && cedula < 40000001) ? "Introduzca una cédula válida (Máximo 40 millones)"
+                        : !placatxt.getText().matches("^[A-Z0-9-]+$") ? "La placa debe contener solo letras mayúsculas, números y puede contener guiones (-)"
+                        : !telefonotxt.getText().matches("^0[0-9]{3}-[0-9]{7}$") ? "Introduzca un teléfono válido (0XXX-XXXXXXX)"
+                        : !direcciontxt.getText().matches("^[a-zA-ZñÑ\\s\\-\\.]+$") ? "Introduzca una dirección válida"
+                        : !(año >= 1960 && año <= 2024) ? "Introduzca un año válido (1960-2024)"
+                        : "Datos validados exitosamente";
 
-        interfaz.actualizarTabla();
-        JOptionPane.showMessageDialog(this, "Registro Modificado exitosamente");
-        this.dispose();
+        JOptionPane.showMessageDialog(this, message);
+
+        if ("Datos validados exitosamente".equals(message)) {
+            registro.setNombre(nombretxt.getText());
+            registro.setApellido(apellidotxt.getText());
+            registro.setDireccion(direcciontxt.getText());
+            registro.setMarca((String) comboboxMarca.getSelectedItem());
+            registro.setModelo((String) comboboxModelo.getSelectedItem());
+            registro.setTelefono(telefonotxt.getText());
+            registro.setColor(colorSeleccionado);
+            registro.setImagen(rutaImagenSeleccionada);
+            registro.setPlaca(placatxt.getText());
+            registro.setAño(año);
+            registro.setCedula(cedula);
+
+            interfaz.actualizarTabla();
+            JOptionPane.showMessageDialog(this, "Registro Modificado exitosamente");
+            this.dispose();
+        }
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Debe llenar la Cédula y el Año del registro adecuadamente", "Error", JOptionPane.ERROR_MESSAGE);
     }
+}
     
     private void eliminarRegistro(){
         int confirmar = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el registro?", "Confirmar", JOptionPane.YES_NO_OPTION);
@@ -277,76 +291,38 @@ public class DetalleRegistro extends JFrame {
     }
     
         private void abrirAlquilar() {
-        Vehiculo vehiculo;
-        String marca = (String) comboboxMarca.getSelectedItem();
-        String modelo = (String) comboboxModelo.getSelectedItem();
-        int year = Integer.parseInt(añotxt.getText());
+            String marca = (String) comboboxMarca.getSelectedItem();
+            String modelo = (String) comboboxModelo.getSelectedItem();
+            int year = Integer.parseInt(añotxt.getText());
+            Vehiculo vehiculo =
+                (modelo.equals("Camry") || modelo.equals("Accord") || modelo.equals("Jetta") || modelo.equals("Fiesta") ||
+                 modelo.equals("Cruze") || modelo.equals("Corolla") || modelo.equals("Civic")) ?
+                    new Sedan(marca, modelo, "Sedán", year) :
+                (modelo.equals("RAV4") || modelo.equals("CR-V") || modelo.equals("Tiguan") || modelo.equals("Silverado")) ?
+                    new Camioneta(marca, modelo, "Camioneta", year) :
+                (modelo.equals("Mustang") || modelo.equals("Camaro") || modelo.equals("Focus") || modelo.equals("Golf")) ?
+                    new Deportivo(marca, modelo, "Deportivo", year) :
+                null;
 
-        switch (modelo) {
-            case "Camry":
-            case "Accord":
-            case "Jetta":
-            case "Fiesta":
-            case "Cruze":
-            case "Corolla":
-            case "Civic":
-                vehiculo = new Sedan(marca, modelo, "Sedán", year);
-                break;
-            case "RAV4":
-            case "CR-V":
-            case "Tiguan":
-            case "Silverado":
-                vehiculo = new Camioneta(marca, modelo, "Camioneta", year);
-                break;
-            case "Mustang":
-            case "Camaro":
-            case "Focus":
-            case "Golf":    
-                vehiculo = new Deportivo(marca, modelo, "Deportivo", year);
-                break;
-            default:
-                JOptionPane.showMessageDialog(this, "Modelo de vehículo no soportado", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
+            Alquiler alquilerVentana = vehiculo != null ? new Alquiler(vehiculo) : null;
+            alquilerVentana.setVisible(vehiculo != null);
         }
-
-        Alquiler alquilerVentana = new Alquiler(vehiculo);
-        alquilerVentana.setVisible(true);
-    }
         
         private void abrirVender() {
-        Vehiculo vehiculo;
-        String marca = (String) comboboxMarca.getSelectedItem();
-        String modelo = (String) comboboxModelo.getSelectedItem();
-        int year = Integer.parseInt(añotxt.getText());
+            String marca = (String) comboboxMarca.getSelectedItem();
+            String modelo = (String) comboboxModelo.getSelectedItem();
+            int year = Integer.parseInt(añotxt.getText());
+            Vehiculo vehiculo =
+                (modelo.equals("Camry") || modelo.equals("Accord") || modelo.equals("Jetta") || modelo.equals("Fiesta") ||
+                 modelo.equals("Cruze") || modelo.equals("Corolla") || modelo.equals("Civic")) ?
+                    new Sedan(marca, modelo, "Sedán", year) :
+                (modelo.equals("RAV4") || modelo.equals("CR-V") || modelo.equals("Tiguan") || modelo.equals("Silverado")) ?
+                    new Camioneta(marca, modelo, "Camioneta", year) :
+                (modelo.equals("Mustang") || modelo.equals("Camaro") || modelo.equals("Focus") || modelo.equals("Golf")) ?
+                    new Deportivo(marca, modelo, "Deportivo", year) :
+                null;
 
-        switch (modelo) {
-            case "Camry":
-            case "Accord":
-            case "Jetta":
-            case "Fiesta":
-            case "Cruze":
-            case "Corolla":
-            case "Civic":
-                vehiculo = new Sedan(marca, modelo, "Sedán", year);
-                break;
-            case "RAV4":
-            case "CR-V":
-            case "Tiguan":
-            case "Silverado":
-                vehiculo = new Camioneta(marca, modelo, "Camioneta", year);
-                break;
-            case "Mustang":
-            case "Camaro":
-            case "Focus":
-            case "Golf":    
-                vehiculo = new Deportivo(marca, modelo, "Deportivo", year);
-                break;
-            default:
-                JOptionPane.showMessageDialog(this, "Modelo de vehículo no soportado", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-        }
-
-        Venta ventaVentana = new Venta(vehiculo);
-        ventaVentana.setVisible(true);
+            Venta alquilerVentana = vehiculo != null ? new Venta(vehiculo) : null;
+            alquilerVentana.setVisible(vehiculo != null);
     }        
 }
