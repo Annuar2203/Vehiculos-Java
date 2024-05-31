@@ -1,8 +1,12 @@
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class Venta extends JFrame {
     private Vehiculo vehiculo;
@@ -10,13 +14,21 @@ public class Venta extends JFrame {
 
     public Venta(Vehiculo vehiculo) {
         this.vehiculo = vehiculo;
-        setTitle("Vender Vehículo");
-        setSize(280, 300);
+
+        setTitle("Vender");
+        setSize(228, 269);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setResizable(false);
         setLocationRelativeTo(null);
         setLayout(new GridBagLayout());
+
         int old = 2024 - vehiculo.getAño();
 
+        // Crear el panel principal y configurar su color de fondo
+        JPanel panelPrincipal = new JPanel(new GridBagLayout());
+        panelPrincipal.setBackground(new Color(50, 145, 157));
+        Font fuente = new Font("Century Schoolbook", Font.PLAIN, 12);
+        
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -24,83 +36,50 @@ public class Venta extends JFrame {
         int y = 0;
 
         // Marca
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Marca:"), gbc);
-
-        gbc.gridx = 1;
-        add(new JLabel(vehiculo.getMarca()), gbc);
-        y++;
+        addLabelyComponentes(new JLabel("Marca:"), new JLabel(vehiculo.getMarca()), gbc, y++, panelPrincipal, fuente);
 
         // Modelo
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Modelo:"), gbc);
-
-        gbc.gridx = 1;
-        add(new JLabel(vehiculo.getModelo()), gbc);
-        y++;
-
-        // Antiguedad
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Antiguedad:"), gbc);
-
-        gbc.gridx = 1;
-        add(new JLabel(Integer.toString(old)), gbc);
-        y++;        
-
-
-        // Descuento
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Descuento:"), gbc);
-
-        gbc.gridx = 1;
-        add(new JLabel(obtenerDescuentoPorAntiguedad(old)*100+"%"), gbc);
-        y++;   
+        addLabelyComponentes(new JLabel("Modelo:"), new JLabel(vehiculo.getModelo()), gbc, y++, panelPrincipal, fuente);
         
-        // Precio de Venta
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Precio de Venta:"), gbc);
+        // Tipo
+        addLabelyComponentes(new JLabel("Tipo:"), new JLabel(vehiculo.getTipo()), gbc, y++, panelPrincipal, fuente);
+        
+        // Antigüedad
+        addLabelyComponentes(new JLabel("Antigüedad:"), new JLabel(Integer.toString(old) + " años"), gbc, y++, panelPrincipal, fuente);
+        
+        // Descuento
+        addLabelyComponentes(new JLabel("Descuento:"), new JLabel(obtenerDescuentoPorAntiguedad(old) * 100 + "%"), gbc, y++, panelPrincipal, fuente);
 
-        gbc.gridx = 1;
-        precioVentaLbl = new JLabel(String.format("%.2f", vehiculo.getPrecioVenta()));
-        add(precioVentaLbl, gbc);
-        y++;
+        // Precio de Venta
+        precioVentaLbl = new JLabel(String.format("%.2f", vehiculo.getPrecioVenta()) + "$");
+        addLabelyComponentes(new JLabel("Precio de Venta:"), precioVentaLbl, gbc, y++, panelPrincipal, fuente);
 
         // IVA
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("IVA (16%):"), gbc);
-
-        gbc.gridx = 1;
         ivaLbl = new JLabel();
-        add(ivaLbl, gbc);
-        y++;
+        addLabelyComponentes(new JLabel("IVA (16%):"), ivaLbl, gbc, y++, panelPrincipal, fuente);
 
         // Precio Total de Venta
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Precio Total de Venta:"), gbc);
-
-        gbc.gridx = 1;
         precioTotalLbl = new JLabel();
-        add(precioTotalLbl, gbc);
-        y++;
+        addLabelyComponentes(new JLabel("Precio Total de Venta:"), precioTotalLbl, gbc, y++, panelPrincipal, fuente);
 
         // Precio con Descuento
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Precio con Descuento:"), gbc);
-
-        gbc.gridx = 1;
         precioConDescuentoLbl = new JLabel();
-        add(precioConDescuentoLbl, gbc);
-        y++;
+        addLabelyComponentes(new JLabel("Precio con Descuento:"), precioConDescuentoLbl, gbc, y++, panelPrincipal, fuente);
+
+        // Añadir el panel principal al frame
+        add(panelPrincipal);
 
         calcularPrecios(); // Calcula los precios al iniciar la ventana
+    }
+
+    private void addLabelyComponentes(JLabel label, JComponent component, GridBagConstraints gbc, int y, JPanel panel, Font fuente) {
+        label.setFont(fuente); // Configurar la fuente del JLabel
+        component.setFont(component instanceof JLabel ? fuente : component.getFont());
+        gbc.gridx = 0;
+        gbc.gridy = y;
+        panel.add(label, gbc);
+        gbc.gridx = 1;
+        panel.add(component, gbc);
     }
 
     private void calcularPrecios() {
@@ -112,9 +91,9 @@ public class Venta extends JFrame {
         double descuento = obtenerDescuentoPorAntiguedad(antiguedad);
         double precioConDescuento = precioTotal - (precioTotal * descuento);
 
-        ivaLbl.setText(String.format("%.2f", iva));
-        precioTotalLbl.setText(String.format("%.2f", precioTotal));
-        precioConDescuentoLbl.setText(String.format("%.2f", precioConDescuento));
+        ivaLbl.setText(String.format("%.2f", iva) + "$");
+        precioTotalLbl.setText(String.format("%.2f", precioTotal) + "$");
+        precioConDescuentoLbl.setText(String.format("%.2f", precioConDescuento) + "$");
     }
 
     private double obtenerDescuentoPorAntiguedad(int antiguedad) {

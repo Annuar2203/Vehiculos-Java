@@ -1,5 +1,5 @@
-
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -7,6 +7,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Collections;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -43,53 +44,59 @@ public class DetalleRegistro extends JFrame {
         this.interfaz = interfaz;
         this.colorSeleccionado = registro.getColor();
         this.rutaImagenSeleccionada = registro.getImagen();
+        this.setBackground(new Color(50, 145, 157));
         setTitle("Detalles del registro");
-        setSize(800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new GridBagLayout());
+        
+        JPanel panelPrincipal = new JPanel(new GridBagLayout());
+        panelPrincipal.setBackground(new Color(50, 145, 157));
+        panelPrincipal.setSize(800,600);
+        setSize(718, 590);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         this.setResizable(false);
-
+        Font fuente = new Font("Century Schoolbook", Font.PLAIN, 12);
         int y = 0;
-
+        
         // ID
-        addLabelAndComponent(new JLabel("ID: "), new JLabel(String.valueOf(registro.getId())), gbc, y++);
+        addLabelyComponentes(new JLabel("ID: "), new JLabel(String.valueOf(registro.getId())), gbc, y++, panelPrincipal, fuente);
 
         // Nombre
         nombretxt = new JTextField(registro.getNombre());
-        addLabelAndComponent(new JLabel("Nombre: "), nombretxt, gbc, y++);
+        addLabelyComponentes(new JLabel("Nombre: "), nombretxt, gbc, y++, panelPrincipal, fuente);
 
         // Apellido
         apellidotxt = new JTextField(registro.getApellido());
-        addLabelAndComponent(new JLabel("Apellido: "), apellidotxt, gbc, y++);
+        addLabelyComponentes(new JLabel("Apellido: "), apellidotxt, gbc, y++, panelPrincipal, fuente);
 
         // Cédula
         cedulatxt = new JTextField(String.valueOf(registro.getCedula()));
-        addLabelAndComponent(new JLabel("Cédula: "), cedulatxt, gbc, y++);
+        addLabelyComponentes(new JLabel("Cédula: "), cedulatxt, gbc, y++, panelPrincipal, fuente);
 
         // Teléfono
         telefonotxt = new JTextField(registro.getTelefono());
-        addLabelAndComponent(new JLabel("Teléfono: "), telefonotxt, gbc, y++);
+        addLabelyComponentes(new JLabel("Teléfono: "), telefonotxt, gbc, y++, panelPrincipal, fuente);
+        // Año del Vehículo
 
         // Placa
         placatxt = new JTextField(registro.getPlaca());
-        addLabelAndComponent(new JLabel("Placa: "), placatxt, gbc, y++);        
+        addLabelyComponentes(new JLabel("Placa: "), placatxt, gbc, y++, panelPrincipal, fuente);        
         
         // Dirección
         direcciontxt = new JTextField(registro.getDireccion());
-        addLabelAndComponent(new JLabel("Dirección: "), direcciontxt, gbc, y++);
+        addLabelyComponentes(new JLabel("Dirección: "), direcciontxt, gbc, y++, panelPrincipal, fuente);
 
-        // Año del Vehículo
         añotxt = new JTextField(String.valueOf(registro.getAño()));
-        addLabelAndComponent(new JLabel("Año del Vehículo: "), añotxt, gbc, y++);
+        addLabelyComponentes(new JLabel("Año del Vehículo: "), añotxt, gbc, y++, panelPrincipal, fuente);
 
         // Marca
         comboboxMarca = new JComboBox<>(new String[]{"Ford", "Chevrolet", "Toyota", "Honda", "Volkswagen"});
         comboboxMarca.setSelectedItem(registro.getMarca());
-        addLabelAndComponent(new JLabel("Marca: "), comboboxMarca, gbc, y++);
+        addLabelyComponentes(new JLabel("Marca: "), comboboxMarca, gbc, y++, panelPrincipal, fuente);
         comboboxMarca.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -100,7 +107,7 @@ public class DetalleRegistro extends JFrame {
         // Modelo
         comboboxModelo = new JComboBox<>(obtenerModelos((String) comboboxMarca.getSelectedItem()));
         comboboxModelo.setSelectedItem(registro.getModelo());
-        addLabelAndComponent(new JLabel("Modelo: "), comboboxModelo, gbc, y++);
+        addLabelyComponentes(new JLabel("Modelo: "), comboboxModelo, gbc, y++, panelPrincipal, fuente);
 
         // Imagen
         lblRutaImagen = new JLabel(rutaImagenSeleccionada);
@@ -115,12 +122,12 @@ public class DetalleRegistro extends JFrame {
             }
         });
         
-        addLabelAndComponent(new JLabel("Ruta de Imagen: "), lblRutaImagen, gbc, y++);
-        addLabelAndComponent(new JLabel("Imagen: "), lblImagen, gbc, y++);
+        addLabelyComponentes(new JLabel("Ruta de Imagen: "), lblRutaImagen, gbc, y++, panelPrincipal, fuente);
+        addLabelyComponentes(new JLabel("Imagen: "), lblImagen, gbc, y++, panelPrincipal, fuente);
         gbc.gridwidth = 2;
         gbc.gridx = 0;
         gbc.gridy = y++;
-        add(btnSeleccionarImagen, gbc);
+        panelPrincipal.add(btnSeleccionarImagen, gbc);
         gbc.gridwidth = 1;
         gbc.gridy = y++;
 
@@ -134,15 +141,20 @@ public class DetalleRegistro extends JFrame {
                 seleccionarColor();
             }
         });
-        addLabelAndComponent(new JLabel("Color: "), btnSeleccionarColor, gbc, y++);
+        addLabelyComponentes(new JLabel("Color: "), btnSeleccionarColor, gbc, y++, panelPrincipal, fuente);
 
         // Botones de acción
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.setBackground(new Color(50, 145, 157));
         JButton btnModificar = new JButton("Modificar");
+        btnModificar.setBackground(Color.GREEN);
         JButton btnEliminar = new JButton("Eliminar");
+        btnEliminar.setBackground(Color.RED);
         JButton btnAlquilar = new JButton("Alquilar");
+        btnAlquilar.setBackground(Color.ORANGE);
         JButton btnVender = new JButton("Vender");
+        btnVender.setBackground(Color.CYAN);
 
         buttonPanel.add(btnModificar);
         buttonPanel.add(Box.createHorizontalStrut(10));
@@ -155,8 +167,14 @@ public class DetalleRegistro extends JFrame {
         gbc.gridwidth = 2;
         gbc.gridx = 0;
         gbc.gridy = y++;
-        add(buttonPanel, gbc);
+        panelPrincipal.add(buttonPanel, gbc);
+        
+        // Añadir el panel principal al frame
+        add(panelPrincipal);
 
+        // Aplicar fuente a todos los componentes del panel principal
+        aplicarFuente(panelPrincipal, fuente);  
+        
         //EVENTOS
         
         btnModificar.addActionListener(new ActionListener() { //MODIFICAR
@@ -186,14 +204,17 @@ public class DetalleRegistro extends JFrame {
                 abrirVender();
             }
         });
+        
+         setLocationRelativeTo(null); // Centrar la ventana en la pantalla
     }
 
-    private void addLabelAndComponent(JLabel label, JComponent component, GridBagConstraints gbc, int y) {
+    private void addLabelyComponentes(JLabel label, JComponent component, GridBagConstraints gbc, int y, JPanel panel, Font fuente) {
+        label.setFont(fuente); // Configurar la fuente del JLabel
         gbc.gridx = 0;
         gbc.gridy = y;
-        add(label, gbc);
+        panel.add(label, gbc);
         gbc.gridx = 1;
-        add(component, gbc);
+        panel.add(component, gbc);
     }
 
     private String[] obtenerModelos(String marca) {
@@ -228,68 +249,82 @@ public class DetalleRegistro extends JFrame {
         btnSeleccionarColor.setBackground(colorSeleccionado);
     }
 
+    private void aplicarFuente(JComponent componente, Font fuente) {
+        componente.setFont(fuente);
+        for (int i = 0; i < componente.getComponentCount(); i++) {
+            if (componente.getComponent(i) instanceof JComponent) {
+                aplicarFuente((JComponent) componente.getComponent(i), fuente);
+            }
+        }
+    }    
+    
     private void actualizarModelo() {
         comboboxModelo.setModel(new javax.swing.DefaultComboBoxModel<>(obtenerModelos((String) comboboxMarca.getSelectedItem())));
     }
 
-private void modificarRegistro() {
-    try {
-        int cedula = Integer.parseInt(cedulatxt.getText());
-        int año = Integer.parseInt(añotxt.getText());
-        
-        // Verificar si todos los campos están llenos
-        boolean camposLlenos = !nombretxt.getText().isEmpty() && !apellidotxt.getText().isEmpty() && 
-                               !cedulatxt.getText().isEmpty() && !telefonotxt.getText().isEmpty() && 
-                               !direcciontxt.getText().isEmpty() && !placatxt.getText().isEmpty() && 
-                               !añotxt.getText().isEmpty() && !comboboxMarca.getSelectedItem().equals("Seleccione marca") && 
-                               !comboboxModelo.getSelectedItem().equals("Seleccione modelo");
+    private void modificarRegistro() {
+        try {
+            int cedula = Integer.parseInt(cedulatxt.getText());
+            int año = Integer.parseInt(añotxt.getText());
 
-        // Validaciones de los campos
-        String message = !camposLlenos ? "Todos los campos deben estar llenos"
-                        : !nombretxt.getText().matches("^[a-zA-ZñÑÁÉÍÓÚáéíóú]+$") ? "El nombre solo debe contener letras"
-                        : !apellidotxt.getText().matches("^[a-zA-ZñÑÁÉÍÓÚáéíóú]+$") ? "El apellido solo debe contener letras"
-                        : !(cedula >= 1 && cedula < 40000001) ? "Introduzca una cédula válida (Máximo 40 millones)"
-                        : !placatxt.getText().matches("^[A-Z0-9-]+$") ? "La placa debe contener solo letras mayúsculas, números y puede contener guiones (-)"
-                        : !telefonotxt.getText().matches("^0[0-9]{3}-[0-9]{7}$") ? "Introduzca un teléfono válido (0XXX-XXXXXXX)"
-                        : !direcciontxt.getText().matches("^[a-zA-ZñÑ\\s\\-\\.]+$") ? "Introduzca una dirección válida"
-                        : !(año >= 1960 && año <= 2024) ? "Introduzca un año válido (1960-2024)"
-                        : "Datos validados exitosamente";
+            // Verificar si todos los campos están llenos
+            boolean camposLlenos = !nombretxt.getText().isEmpty() && !apellidotxt.getText().isEmpty() && 
+                                   !cedulatxt.getText().isEmpty() && !telefonotxt.getText().isEmpty() && 
+                                   !direcciontxt.getText().isEmpty() && !placatxt.getText().isEmpty() && 
+                                   !añotxt.getText().isEmpty() && !comboboxMarca.getSelectedItem().equals("Seleccione marca") && 
+                                   !comboboxModelo.getSelectedItem().equals("Seleccione modelo");
 
-        JOptionPane.showMessageDialog(this, message);
+            // Validaciones de los campos
+            String message = !camposLlenos ? "Todos los campos deben estar llenos"
+                            : !nombretxt.getText().matches("^[a-zA-ZñÑÁÉÍÓÚáéíóú]+$") ? "El nombre solo debe contener letras"
+                            : !apellidotxt.getText().matches("^[a-zA-ZñÑÁÉÍÓÚáéíóú]+$") ? "El apellido solo debe contener letras"
+                            : !(cedula >= 1 && cedula < 40000001) ? "Introduzca una cédula válida (Máximo 40 millones)"
+                            : !placatxt.getText().matches("^[A-Z0-9-]+$") ? "La placa debe contener solo letras mayúsculas, números y puede contener guiones (-)"
+                            : !telefonotxt.getText().matches("^0[0-9]{3}-[0-9]{7}$") ? "Introduzca un teléfono válido (0XXX-XXXXXXX)"
+                            : !direcciontxt.getText().matches("^[a-zA-ZñÑ\\s\\-\\,\\.]+$") ? "Introduzca una dirección válida"
+                            : !(año >= 1960 && año <= 2024) ? "Introduzca un año válido (1960-2024)"
+                            : "Datos validados exitosamente";
 
-        if ("Datos validados exitosamente".equals(message)) {
-            registro.setNombre(nombretxt.getText());
-            registro.setApellido(apellidotxt.getText());
-            registro.setDireccion(direcciontxt.getText());
-            registro.setMarca((String) comboboxMarca.getSelectedItem());
-            registro.setModelo((String) comboboxModelo.getSelectedItem());
-            registro.setTelefono(telefonotxt.getText());
-            registro.setColor(colorSeleccionado);
-            registro.setImagen(rutaImagenSeleccionada);
-            registro.setPlaca(placatxt.getText());
-            registro.setAño(año);
-            registro.setCedula(cedula);
+            JOptionPane.showMessageDialog(this, message);
 
-            interfaz.actualizarTabla();
-            JOptionPane.showMessageDialog(this, "Registro Modificado exitosamente");
-            this.dispose();
-        }
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Debe llenar la Cédula y el Año del registro adecuadamente", "Error", JOptionPane.ERROR_MESSAGE);
-    }
-}
-    
-    private void eliminarRegistro(){
-        int confirmar = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el registro?", "Confirmar", JOptionPane.YES_NO_OPTION);
-        if(confirmar == JOptionPane.YES_OPTION){
-            interfaz.elliminarRegistro(registro);
-            for (int i = 0; i < interfaz.listaReg.size(); i++) {
-                interfaz.listaReg.get(i).setId(i + 1);
+            if ("Datos validados exitosamente".equals(message)) {
+                registro.setNombre(nombretxt.getText());
+                registro.setApellido(apellidotxt.getText());
+                registro.setDireccion(direcciontxt.getText());
+                registro.setMarca((String) comboboxMarca.getSelectedItem());
+                registro.setModelo((String) comboboxModelo.getSelectedItem());
+                registro.setTelefono(telefonotxt.getText());
+                registro.setColor(colorSeleccionado);
+                registro.setImagen(rutaImagenSeleccionada);
+                registro.setPlaca(placatxt.getText());
+                registro.setAño(año);
+                registro.setCedula(cedula);
+
+                interfaz.actualizarTabla();
+                JOptionPane.showMessageDialog(this, "Registro Modificado exitosamente");
+                this.dispose();
             }
-          this.dispose();
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Debe llenar la Cédula y el Año del registro adecuadamente", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     
+        private void eliminarRegistro() {
+            // Método para realizar la eliminación y reindexación
+            Runnable eliminarYReindexar = () -> {
+                interfaz.elliminarRegistro(registro);
+                Collections.nCopies(interfaz.listaReg.size(), 1).stream()
+                        .map(i -> interfaz.listaReg.indexOf(i))
+                        .forEach(index -> interfaz.listaReg.get(index).setId(index + 1));
+                this.dispose();
+            };
+
+            // Solicitar confirmación al usuario
+            int confirmar = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el registro?", "Confirmar", JOptionPane.YES_NO_OPTION);
+            if (confirmar == JOptionPane.YES_OPTION) {
+                eliminarYReindexar.run();
+            }
+        }
         private void abrirAlquilar() {
             String marca = (String) comboboxMarca.getSelectedItem();
             String modelo = (String) comboboxModelo.getSelectedItem();
@@ -324,5 +359,5 @@ private void modificarRegistro() {
 
             Venta alquilerVentana = vehiculo != null ? new Venta(vehiculo) : null;
             alquilerVentana.setVisible(vehiculo != null);
-    }        
+        }
 }

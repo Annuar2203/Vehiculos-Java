@@ -1,12 +1,16 @@
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class Alquiler extends JFrame {
@@ -16,11 +20,18 @@ public class Alquiler extends JFrame {
 
     public Alquiler(Vehiculo vehiculo) {
         this.vehiculo = vehiculo;
-        setTitle("Alquilar Vehículo");
-        setSize(300, 300);
+
+        setTitle("Alquilar");
+        setSize(244, 278);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setResizable(false);
         setLocationRelativeTo(null);
         setLayout(new GridBagLayout());
+
+        // Crear el panel principal y configurar su color de fondo
+        JPanel panelPrincipal = new JPanel(new GridBagLayout());
+        panelPrincipal.setBackground(new Color(50, 145, 157));
+        Font fuente = new Font("Century Schoolbook", Font.PLAIN, 12);
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -29,94 +40,61 @@ public class Alquiler extends JFrame {
         int y = 0;
 
         // Marca
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Marca:"), gbc);
-        
-        gbc.gridx = 1;
-        add(new JLabel(vehiculo.getMarca()), gbc);
-        y++;
+        addLabelyComponentes(new JLabel("Marca:"), new JLabel(vehiculo.getMarca()), gbc, y++, panelPrincipal, fuente);
 
         // Modelo
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Modelo:"), gbc);
-        
-        gbc.gridx = 1;
-        add(new JLabel(vehiculo.getModelo()), gbc);
-        y++;
+        addLabelyComponentes(new JLabel("Modelo:"), new JLabel(vehiculo.getModelo()), gbc, y++, panelPrincipal, fuente);
         
         // Tipo
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Tipo:"), gbc);
+        addLabelyComponentes(new JLabel("Tipo:"), new JLabel(vehiculo.getTipo()), gbc, y++, panelPrincipal, fuente);
         
-        gbc.gridx = 1;
-        add(new JLabel(vehiculo.getTipo()), gbc);
-        y++;
-        
-
         // Precio por día
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Precio de Alquiler:"), gbc);
-        
-        gbc.gridx = 1;
-        precioPorDiaLbl = new JLabel(String.format("%.2f", vehiculo.getPrecioAlquilerPorDia()));
-        add(precioPorDiaLbl, gbc);
-        y++;
+        precioPorDiaLbl = new JLabel(String.format("%.2f", vehiculo.getPrecioAlquilerPorDia()) + "$");
+        addLabelyComponentes(new JLabel("Precio de Alquiler:"), precioPorDiaLbl, gbc, y++, panelPrincipal, fuente);
 
         // Descuento
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Descuento:"), gbc);
-        
-        gbc.gridx = 1;
-        add(new JLabel(String.format("%.2f%%", vehiculo.getDescuento() * 100)), gbc);
-        y++;
+        addLabelyComponentes(new JLabel("Descuento:"), new JLabel(String.format("%.2f%%", vehiculo.getDescuento() * 100)), gbc, y++, panelPrincipal, fuente);
 
         // Días de Alquiler
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Días de Alquiler:"), gbc);
-        
-        gbc.gridx = 1;
         diasAlquilerTxt = new JTextField();
-        add(diasAlquilerTxt, gbc);
-        y++;
+        addLabelyComponentes(new JLabel("Días de Alquiler:"), diasAlquilerTxt, gbc, y++, panelPrincipal, fuente);
 
         // Precio Total
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Precio Total:"), gbc);
-        
-        gbc.gridx = 1;
         precioTotalLbl = new JLabel();
-        add(precioTotalLbl, gbc);
-        y++;
+        addLabelyComponentes(new JLabel("Precio Total:"), precioTotalLbl, gbc, y++, panelPrincipal, fuente);
 
         // Precio con Descuento
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        add(new JLabel("Precio Total con Descuento:"), gbc);
-        
-        gbc.gridx = 1;
         precioConDescuentoLbl = new JLabel();
-        add(precioConDescuentoLbl, gbc);
-        y++;
+        addLabelyComponentes(new JLabel("Precio Total con Descuento:"), precioConDescuentoLbl, gbc, y++, panelPrincipal, fuente);
 
         // Botón Calcular
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        gbc.gridwidth = 2;
         JButton calcularBtn = new JButton("Calcular");
+        calcularBtn.setFont(fuente);
+        gbc.gridx = 0;
+        gbc.gridy = y++;
+        gbc.gridwidth = 2;
+        panelPrincipal.add(calcularBtn, gbc);
+
         calcularBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 calcularPrecios();
             }
         });
-        add(calcularBtn, gbc);
+
+        // Añadir el panel principal al frame
+        add(panelPrincipal);
+    }
+
+    private void addLabelyComponentes(JLabel label, JComponent component, GridBagConstraints gbc, int y, JPanel panel, Font fuente) {
+        label.setFont(fuente); // Configurar la fuente del JLabel
+        component.setFont(fuente);
+
+        gbc.gridx = 0;
+        gbc.gridy = y;
+        panel.add(label, gbc);
+        gbc.gridx = 1;
+        panel.add(component, gbc);
     }
 
     private void calcularPrecios() {
@@ -125,8 +103,8 @@ public class Alquiler extends JFrame {
             double precioTotal = vehiculo.getPrecioAlquilerPorDia() * dias;
             double precioConDescuento = precioTotal - (precioTotal * vehiculo.getDescuento());
 
-            precioTotalLbl.setText(String.format("%.2f", precioTotal));
-            precioConDescuentoLbl.setText(String.format("%.2f", precioConDescuento));
+            precioTotalLbl.setText(String.format("%.2f", precioTotal) + "$");
+            precioConDescuentoLbl.setText(String.format("%.2f", precioConDescuento) + "$");
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Por favor ingrese un número válido en días", "Error", JOptionPane.ERROR_MESSAGE);
         }
